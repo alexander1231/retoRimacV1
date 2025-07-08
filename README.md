@@ -15,16 +15,18 @@ authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
 
 ### endpoints:
 
-  GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/fusionados
-  POST - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/almacenar
-  GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/historial
-  GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger
-  GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger.json
+  1. GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/fusionados
+  2. POST - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/almacenar
+  3. GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/historial
+  4. GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger
+  5. GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger.json
+  
 ###functions:
-  fusionados: retoRimacV1-dev-fusionados (22 MB)
-  almacenar: retoRimacV1-dev-almacenar (22 MB)
-  historial: retoRimacV1-dev-historial (22 MB)
-  swaggerUI: retoRimacV1-dev-swagger-ui (22 MB)
-  swaggerJSON: retoRimacV1-dev-swagger-json (22 MB)
+
+  1. fusionados: retoRimacV1-dev-fusionados (22 MB)
+  2. almacenar: retoRimacV1-dev-almacenar (22 MB)
+  3. historial: retoRimacV1-dev-historial (22 MB)
+  4. swaggerUI: retoRimacV1-dev-swagger-ui (22 MB)
+  4. swaggerJSON: retoRimacV1-dev-swagger-json (22 MB)
 
 
