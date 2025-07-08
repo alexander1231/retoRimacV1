@@ -1,0 +1,178 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: x4nd3r
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: retorimacv1
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: retoRimacV1
+
+stages:
+  default:
+    params:
+      tableNameFusionados: "rimac-fusionados"
+      tableNameAlmacenar: "rimac-almacenar"
+      tableNameHistorial: "rimac-Historial"
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: us-east-1
+  tracing:
+    lambda: true
+    apiGateway: true
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - xray:PutTraceSegments
+            - xray:PutTelemetryRecords
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - dynamodb:*
+          Resource:
+            - Fn::GetAtt: [RimacFusionados, Arn]
+            - Fn::GetAtt: [RimacAlmacenar, Arn]
+            - Fn::GetAtt: [RimacHistorial, Arn]
+  environment:
+    USERS_TABLE_FUSI: ${param:tableNameFusionados}
+    USERS_TABLE_ALMA: ${param:tableNameFusionados}
+    USERS_TABLE_HIST: ${param:tableNameFusionados}
+
+functions:
+  fusionados:
+    handler: src/fusionados.index
+    memorySize: 1024
+    timeout: 29
+    vpc:
+      securityGroupIds:
+        - sg-0b790b35df135a08c
+      subnetIds:
+        - subnet-08ba0db8bed32c375
+        - subnet-0ce718c8e25619710
+        - subnet-01f6e694bb16094a9
+        - subnet-0b689f7c75024c4cb
+        - subnet-0dfaa2629bba0b532
+        - subnet-043ec809e3385705a
+    events:
+      - httpApi:
+          path: /fusionados
+          method: GET
+          swaggerTags:
+            - Fusionados
+          documentation:
+            summary: "Obtener personajes fusionados"
+            description: "Devuelve una combinación de personajes de SWAPI y PokeAPI"
+            methodResponses:
+              - statusCode: 200
+    environment:
+      REDIS_HOST: 'retorimac-y4gvft.serverless.use1.cache.amazonaws.com'
+      REDIS_PORT: 6379
+  almacenar:
+    handler: src/almacenar.index
+    events:
+      - httpApi:
+          path: /almacenar
+          method: POST
+  historial:
+    handler: src/historial.index
+    events:
+      - httpApi:
+          path: /historial
+          method: GET
+
+resources:
+  Resources:
+    NatEIP:
+      Type: AWS::EC2::EIP
+      Properties:
+        Domain: vpc
+
+    NatGateway:
+      Type: AWS::EC2::NatGateway
+      Properties:
+        AllocationId: !GetAtt NatEIP.AllocationId
+        SubnetId: subnet-08ba0db8bed32c375
+
+    PrivateRouteTable:
+      Type: AWS::EC2::RouteTable
+      Properties:
+        VpcId: vpc-043616ea754962754
+
+    PrivateRoute:
+      Type: AWS::EC2::Route
+      Properties:
+        RouteTableId: !Ref PrivateRouteTable
+        DestinationCidrBlock: 0.0.0.0/0
+        NatGatewayId: !Ref NatGateway
+
+    Subnet1RouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        SubnetId: subnet-0ce718c8e25619710
+        RouteTableId: !Ref PrivateRouteTable
+
+    Subnet2RouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        SubnetId: subnet-01f6e694bb16094a9
+        RouteTableId: !Ref PrivateRouteTable
+
+    Subnet3RouteTableAssociation:
+      Type: AWS::EC2::SubnetRouteTableAssociation
+      Properties:
+        SubnetId: subnet-0b689f7c75024c4cb
+        RouteTableId: !Ref PrivateRouteTable
+
+    RimacFusionados:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: Id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableNameFusionados}
+    RimacAlmacenar:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: Id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableNameAlmacenar}
+    RimacHistorial:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: Id
+            AttributeType: S
+        KeySchema:
+          - AttributeName: Id
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST
+        TableName: ${param:tableNameHistorial}
+
+plugins:
+  - serverless-auto-swagger
+
+custom:
+  autoswagger:
+    typefiles: [ './src/types/api-types.d.ts' ] # si defines tipos
+    basePath: '/'
+    generateSwaggerOnDeploy: true
+  esbuild:
+    bundle: true
+    minify: false
+    sourcemap: true
+    exclude: [ 'aws-sdk' ]
+    target: node20
+    platform: node
+    define:
+      'require.resolve': undefined
+    packager: npm
