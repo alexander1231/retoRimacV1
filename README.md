@@ -13,13 +13,14 @@ authorAvatar: 'https://avatars1.githubusercontent.com/u/13742415?s=200&v=4'
 
 # Serverless Framework Node Express API on AWS
 
-endpoints:
+### endpoints:
+
   GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/fusionados
   POST - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/almacenar
   GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/historial
   GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger
   GET - https://fc49wyj738.execute-api.us-east-1.amazonaws.com/swagger.json
-functions:
+###functions:
   fusionados: retoRimacV1-dev-fusionados (22 MB)
   almacenar: retoRimacV1-dev-almacenar (22 MB)
   historial: retoRimacV1-dev-historial (22 MB)
